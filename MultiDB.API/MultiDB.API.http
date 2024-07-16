@@ -1,0 +1,6 @@
+@MultiDB.API_HostAddress = http://localhost:5297
+
+GET {{MultiDB.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
