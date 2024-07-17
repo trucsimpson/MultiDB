@@ -1,34 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using MultiDB.Infrastructure.Configuration;
 
 namespace MultiDB.Infrastructure.Data
 {
     public interface IApplicationDbContextFactory
     {
-        ApplicationDbContext CreateMasterDbContext();
-        ApplicationDbContext CreateReplicaDbContext(string tenantId);
+        ApplicationDbContext CreateDbContext(string tenantId);
     }
 
     public class ApplicationDbContextFactory : IApplicationDbContextFactory
     {
-        private readonly IConfiguration _configuration;
-
-        public ApplicationDbContextFactory(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
-
-        public ApplicationDbContext CreateMasterDbContext()
+        public ApplicationDbContext CreateDbContext(string connectionString)
         {
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseSqlServer(_configuration.GetConnectionString("MasterDb"));
-            return new ApplicationDbContext(optionsBuilder.Options);
-        }
-
-        public ApplicationDbContext CreateReplicaDbContext(string tenantId)
-        {
-            var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
-            optionsBuilder.UseSqlServer(_configuration.GetConnectionString($"ReplicaDb_{tenantId}"));
+            optionsBuilder.UseSqlServer(connectionString);
             return new ApplicationDbContext(optionsBuilder.Options);
         }
     }

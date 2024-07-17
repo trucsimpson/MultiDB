@@ -1,39 +1,31 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using MultiDB.Infrastructure.Configuration;
 
 namespace MultiDB.Infrastructure.Data
 {
     public class DatabaseUpdater
     {
-        private readonly IConfiguration _configuration;
+        private readonly IAppSettings _appSettings;
         private readonly IApplicationDbContextFactory _contextFactory;
 
-        public DatabaseUpdater(IConfiguration configuration, IApplicationDbContextFactory contextFactory)
+        public DatabaseUpdater(IAppSettings appSettings, IApplicationDbContextFactory contextFactory)
         {
-            _configuration = configuration;
+            _appSettings = appSettings;
             _contextFactory = contextFactory;
         }
 
         public async Task UpdateAllDatabases()
         {
             // Update master database
-            await UpdateDatabase(_contextFactory.CreateMasterDbContext());
+            var masterConnection = _appSettings.GetMasterConnection();
+            _contextFactory.CreateDbContext(masterConnection).Database.Migrate();
 
             // Update replica databases
-            var replicaConnections = _configuration.GetSection("ConnectionStrings")
-                .GetChildren()
-                .Where(x => x.Key.StartsWith("ReplicaDb_Tenant"))
-                .ToDictionary(x => x.Key, x => x.Value);
-            foreach (var (key, connectionString) in replicaConnections)
+            var replicaConnections = _appSettings.GetReplicateConnections();
+            foreach (var (key, replicateConnection) in replicaConnections)
             {
-                var tenantId = key.Substring("ReplicaDb_".Length);
-                await UpdateDatabase(_contextFactory.CreateReplicaDbContext(tenantId));
+                _contextFactory.CreateDbContext(replicateConnection).Database.Migrate();
             }
-        }
-
-        private async Task UpdateDatabase(ApplicationDbContext context)
-        {
-            await context.Database.MigrateAsync();
         }
     }
 }

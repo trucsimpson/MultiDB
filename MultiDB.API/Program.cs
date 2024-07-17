@@ -2,9 +2,9 @@ using MediatR;
 using MultiDB.API.Extensions;
 using MultiDB.Application;
 using MultiDB.Core.Repositories;
+using MultiDB.Infrastructure.Configuration;
 using MultiDB.Infrastructure.Data;
 using MultiDB.Infrastructure.Repositories;
-using System.Reflection.Metadata;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +20,7 @@ builder.Services.AddMediatR(typeof(Anchor).Assembly);
 builder.Services.AddSingleton<IApplicationDbContextFactory, ApplicationDbContextFactory>();
 builder.Services.AddScoped(typeof(IWriteRepository<>), typeof(WriteRepository<>));
 builder.Services.AddScoped(typeof(IReadRepository<>), typeof(ReadRepository<>));
+builder.Services.AddSingleton<IAppSettings, AppSettings>();
 builder.Services.AddScoped<DatabaseUpdater>();
 
 var app = builder.Build();
