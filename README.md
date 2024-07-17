@@ -1,5 +1,5 @@
 # Master db and multiple replicate db
-Dự án này áp dụng mô hình cơ sở dữ liệu master - replicate, với một master db và nhiều replicate db có cấu trúc tương đồng. Số lượng replicate db được xác định dựa vào file appsetting.json Quá trình ghi dữ liệu sẽ được thực hiện trên cơ sở dữ liệu chính, trong khi việc đọc dữ liệu sẽ được điều hướng đến các replicate db phù hợp, dựa trên thông tin tenant được cung cấp.
+Dự án này áp dụng mô hình cơ sở dữ liệu master - replicate, với một master db và nhiều replicate db có cấu trúc tương đồng. Số lượng replicate db được xác định dựa vào file appsetting.json. Quá trình ghi dữ liệu sẽ được thực hiện trên cơ sở dữ liệu chính, trong khi việc đọc dữ liệu sẽ được điều hướng đến các replicate db phù hợp, dựa trên thông tin tenant được cung cấp.
 
 ```
 "ConnectionStrings": {
@@ -26,4 +26,6 @@ Update-Database -Context ApplicationDbContext
 ```
 Update-Database -Args "Tenant1" -Context ApplicationDbContext
 ```
-Trong đó "Tenant1" là TenantId truyền vào
+Trong đó "Tenant1" là TenantId truyền vào.
+
+Khi add Migration rồi có thể không cần chạy lệnh update Migration. Khi start lên tự động update Migration cho từng database
